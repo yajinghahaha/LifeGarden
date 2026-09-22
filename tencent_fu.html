@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>引导练习与日常安排研究 · 一个月回访</title>
+<script src="https://unpkg.com/jspsych@7.3.4"></script>
+<script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.3"></script>
+<script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+<script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.3"></script>
+<script src="https://unpkg.com/@jspsych/plugin-call-function@1.1.3"></script>
+<script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
+<script src="https://unpkg.com/@jspsych/plugin-initialize-microphone@1.0.3"></script>
+<script src="https://unpkg.com/@jspsych/plugin-html-audio-response@1.0.3"></script>
+<link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet">
+<style>
+  :root { --bg:#0F2416; --bg2:#15301E; --card:#1B3324; --card2:#22402D; --line:#2E4A38; --text:#EAF2EC; --sub:#A9BEB0; --green:#6BBF59; --green2:#4A8C3F; --gold:#E9C46A; --warn:#E88A6F; }
+  html, body { background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); min-height: 100%; }
+  body { color: var(--text); }
+  .jspsych-display-element { color: var(--text); }
+  .jspsych-content { max-width: 680px; font-size: 17px; line-height: 1.8; color: var(--text); }
+  .lg-box { text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; margin: 10px 0; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+  .lg-box h2, .lg-box h3 { color: #CFEBC6; margin: 4px 0 12px; letter-spacing: .5px; }
+  .lg-box b { color: #fff; }
+  .lg-muted { color: var(--sub); font-size: 14px; }
+  .lg-form label.lg-radio { display: block; margin: 6px 0; padding: 10px 12px; background: var(--card2); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+  .lg-form label.lg-radio:has(input:checked) { border-color: var(--green); background: #2A4F35; }
+  .lg-q { margin: 14px 0; padding: 10px 0 4px; border-top: 1px dashed var(--line); }
+  .lg-q input[type=text], .lg-q input[type=number], .lg-q textarea, .lg-q select, .lg-form input[type=text] { width: 100%; box-sizing: border-box; padding: 10px; font-size: 17px; color: var(--text); background: #0E1F14; border: 1px solid var(--line); border-radius: 10px; margin-top: 6px; }
+  .lg-q input[type=number] { width: 140px; }
+  input[type=checkbox], input[type=radio] { accent-color: var(--green); transform: scale(1.15); margin-right: 6px; }
+  .lg-likert { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; font-size: 14px; color: var(--sub); }
+  .lg-likert label { display: flex; flex-direction: column; align-items: center; padding: 4px 6px; border-radius: 8px; background: var(--card2); color: var(--text); }
+  /* 滑块 */
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 6px; background: linear-gradient(90deg, var(--green) 0%, var(--green) var(--fill,0%), var(--line) var(--fill,0%), var(--line) 100%); outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 3px solid var(--green); box-shadow: 0 2px 6px rgba(0,0,0,.35); }
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 3px solid var(--green); }
+  .lg-sl { display: grid; grid-template-columns: 6.5em 1fr 2em; align-items: center; gap: 10px; margin: 14px 0 0; }
+  .lg-sl output { font-weight: 700; color: #CFEBC6; text-align: right; }
+  .lg-sl-scale { display: flex; justify-content: space-between; margin: 2px 2.5em 0 7.2em; font-size: 12px; color: var(--sub); }
+  /* 花园 */
+  .lg-pool { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; background: #0E1F14; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; margin: 8px 0 14px; }
+  .lg-pool b { font-size: 28px; color: var(--gold); }
+  .lg-pool b.lg-done { color: var(--green); }
+  .lg-pool b.lg-over { color: var(--warn); }
+  .lg-pool-bar { flex-basis: 100%; height: 6px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  #lg-pool-fill { height: 100%; width: 100%; background: var(--gold); transition: width .15s; }
+  .lg-tree-row { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; background: var(--card2); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; margin: 10px 0; }
+  .lg-tree { width: 56px; height: 56px; display: flex; align-items: flex-end; justify-content: center; background: radial-gradient(circle at 50% 90%, #3B2A1A 0 30%, transparent 31%); }
+  .lg-tree-icon { font-size: 30px; transition: transform .2s; transform-origin: 50% 100%; display: inline-block; }
+  .lg-tree-top { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .lg-tree-top .lg-name { font-weight: 600; }
+  .lg-tree-top output { font-weight: 700; color: #CFEBC6; }
+  /* 引导练习 */
+  .lg-breath { position: relative; width: 170px; height: 170px; margin: 18px auto; }
+  .lg-breath-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(107,191,89,.5); background: radial-gradient(circle, rgba(107,191,89,.18), rgba(107,191,89,0) 70%); }
+  .lg-breath.on .lg-breath-ring { animation: lg-breathe 10s ease-in-out infinite; }
+  .lg-breath-core { position: absolute; inset: 35px; border-radius: 50%; background: #1F4A2A; display: flex; align-items: center; justify-content: center; color: #CFEBC6; font-weight: 600; font-size: 15px; }
+  @keyframes lg-breathe { 0%,100% { transform: scale(.82); opacity: .6; } 50% { transform: scale(1.06); opacity: 1; } }
+  .lg-player { text-align: center; }
+  .lg-player button { font-size: 16px; padding: 9px 22px; margin: 0 6px; border-radius: 22px; border: 1px solid var(--line); background: var(--card2); color: var(--text); }
+  .lg-card { background: #2B2A1C; border: 1px solid #5A5230; color: #F1E6BE; border-radius: 12px; padding: 10px 12px; font-size: 14px; margin-top: 12px; }
+  .lg-code { font-family: Consolas, monospace; font-size: 26px; font-weight: 700; letter-spacing: 2px; color: var(--gold); margin: 10px 0; }
+  .lg-dd { font-size: 18px; }
+  .jspsych-btn { font-size: 17px; padding: 12px 28px; border-radius: 24px; border: none; background: var(--green2); color: #fff; margin: 8px 6px; box-shadow: 0 3px 10px rgba(0,0,0,.25); }
+  .jspsych-btn:hover { background: #57A04A; }
+  .jspsych-btn:disabled { background: #33463A; color: #7F9486; box-shadow: none; }
+  #jspsych-survey-html-form-next { font-size: 17px; padding: 12px 28px; border-radius: 24px; border: none; background: var(--green2); color: #fff; }
+  svg#lg-line line { stroke: #CFEBC6; } svg#lg-line text { fill: #A9BEB0; }
+</style>
+</head>
+<body>
+<script>window.LG_SESSION = "fu"; window.LG_PLATFORM = "tencent";</script>
+<script src="config.js?v=20.6"></script>
+<script src="study.js?v=20.6"></script>
+</body>
+</html>

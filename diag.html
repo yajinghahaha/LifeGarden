@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataPipe 诊断</title>
+<style>body{font-family:-apple-system,"PingFang SC",sans-serif;max-width:640px;margin:20px auto;padding:0 14px;line-height:1.7}button{font-size:16px;padding:10px 18px;margin:6px 6px 6px 0;border-radius:8px}pre{background:#f4f4f4;padding:10px;white-space:pre-wrap;word-break:break-all;font-size:13px}</style>
+<script src="config.js?v=20.6"></script></head>
+<body>
+<h2>DataPipe 诊断页</h2>
+<p>当前加载的配置版本：<b id="ver"></b>　DataPipe ID：<b id="id"></b></p>
+<p>依次点三个按钮，把下面灰框里的结果截图发给 Claude。</p>
+<button onclick="t1()">① 简单数据</button><button onclick="t2()">② 实验同格式数据</button><button onclick="t3()">③ 录音接口</button>
+<pre id="out">（结果显示在这里）</pre>
+<script>
+const C = window.LG_CONFIG; document.getElementById('ver').textContent = C.VERSION; document.getElementById('id').textContent = C.DATAPIPE_ID;
+const out = (m) => { document.getElementById('out').textContent += '\n' + m; };
+const stamp = () => new Date().toISOString().replace(/[:.]/g, '-');
+async function post(url, body, label) {
+  try { const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': '*/*' }, body: JSON.stringify(body) });
+        const t = await r.text(); out(label + ' → HTTP ' + r.status + '  ' + t.slice(0, 300)); }
+  catch (e) { out(label + ' → 网络错误 ' + e); }
+}
+function t1() { post('https://pipe.jspsych.org/api/data/', { experimentID: C.DATAPIPE_ID, filename: 'diag_simple_' + stamp() + '.json', data: JSON.stringify([{ trial_type: 'diag', x: 1 }]) }, '① 简单数据'); }
+function t2() { const obj = { pid: 'diag', session: 'd0', store: { a: { b: [1, 2, 3] } }, note: '中文测试' };
+  post('https://pipe.jspsych.org/api/data/', { experimentID: C.DATAPIPE_ID, filename: 'diag_full_' + stamp() + '.json', data: JSON.stringify([{ trial_type: 'lifegarden_diag', pid: 'diag', session: 'd0', payload_json: JSON.stringify(obj) }]) }, '② 实验同格式'); }
+function t3() { post('https://pipe.jspsych.org/api/base64/', { experimentID: C.DATAPIPE_ID, filename: 'diag_b64_' + stamp() + '.txt', data: btoa('hello') }, '③ 录音接口'); }
+</script>
+</body></html>
